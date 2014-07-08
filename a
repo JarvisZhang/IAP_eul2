@@ -1,0 +1,321 @@
+diaghi.F90:SUBROUTINE DIAGHI(IGZ)
+diagpp.F90:SUBROUTINE DIAGPP
+diagpp.F90:! Purpose: COMPUTE PRESSURE AT MODEL & INTERFACE SIGMA LAYERS
+dycore.F90:! !IROUTINE: dycore_is --- determine dynamical core in use
+dycore.F90:! !INPUT PARAMETERS:
+dyfram.F90:SUBROUTINE DYFRAM( NENG,NFST,NSEQ,NSLT, adv_state, detam, etamid, cwava,   &
+dyfram.F90:! -------------------- BACK FROM PHYSICS ROUTINE TO DYNAMICS ROUTINE --------------------------
+dyfram.F90:!--------------- COMPUTE GEOPOTENTIAL HEIGHT DEPARTURE ---------------------------
+dynamics_vars.F90:! !IROUTINE: dynamics_init --- initialize the lin-rood dynamical core
+dynamics_vars.F90:! !INPUT PARAMETERS:
+dynamics_vars.F90:! !IROUTINE: dynamics_clean -- clean up Lin-Rood-specific variables
+dynamics_vars.F90:! !ROUTINE:  setrig --- Specify the grid attributes
+dynamics_vars.F90:! !ROUTINE:  set_eta --- Define vertical coordinate
+dynamics_vars.F90:! !ROUTINE:  dynpkg_init --- Initialization for dynamics package
+dynamics_vars.F90:! !ROUTINE:  d_split --- find proper value for nsplit if not specified
+dynamics_vars.F90:! !INPUT PARAMETERS:
+dynamics_vars.F90:! !ROUTINE:  spmd_vars_init --- Initialization of SPMD-related variables
+dynamics_vars.F90:! !ROUTINE:  spmd_vars_clean --- Clean the SPMD-related variables
+Dyn_const.F90:   SUBROUTINE STFRAM          ! zhh 2007.11.11
+Dyn_const.F90:!     THE FOLLOWINGS ARE SPECIAL FOR PHYSICS' ROUTINES
+dynpkg.F90:   use IAP_prog,   only: U, V, T, Q, PLY, PT, UT, VT, TT, QT, GHS, P, Pstar1, PS2, psa,  &
+dynpkg.F90:         write(6,*) 'UT(4,26,65) =', UT(4,26,65), ' T(4,26,65) =', T(4,26,65)
+Engy_const.F90:   SUBROUTINE ENERGY
+Engy_const.F90:!  COMPUTE GLOBAL DYNAMIC ENERGY BUGET
+Engy_const.F90:      use IAP_prog,  only: Psa, P, GHS, UT, VT, TT, T
+Engy_const.F90:      real(r8) :: UT0, VT0, TT0, T0
+Engy_const.F90:               UT0     = UT(I,K,J)
+Engy_const.F90:               WU(K)   = DSHK  * ( UT0*UT0 ) * P00   ! WU = 0.5 * U^2 * DSIG(K) * P0
+Engy_const.F90:   END SUBROUTINE
+Engy_const.F90:   SUBROUTINE GMPRFL(GMUVTQ)
+Engy_const.F90:!  COMPUTE GLOBAL DYNAMIC PROFILES
+Engy_const.F90:   END SUBROUTINE
+Engy_const.F90:   SUBROUTINE GAREAM(F,IX,IP,GMF)
+Engy_const.F90:!  COMPUTE THE GLOBAL AREA MEAN OF A VARIABLE F
+Engy_const.F90:   END SUBROUTINE
+Engy_const.F90:   SUBROUTINE GPAREA(FFF,IX,IP,GMF)
+Engy_const.F90:!  COMPUTE THE GLOBAL AREA MASS MEAN OF A VARIABLE FFF
+Engy_const.F90:   END SUBROUTINE
+Engy_const.F90:   SUBROUTINE STENGC
+Engy_const.F90:   END SUBROUTINE
+filt2d1.F90:SUBROUTINE FILT2D1(CH,IV,IP,IC)
+filt2d.F90:SUBROUTINE FILT2D(CH,IV,IP,IC)
+Filt.F90:   integer  :: NCUT(JH,4)         ! critical wave number at latitude J    
+Filt.F90:   SUBROUTINE FILTER(CH,ID)
+Filt.F90:         NCT        = NCUT(J,ID)
+Filt.F90:   END SUBROUTINE
+Filt.F90:   SUBROUTINE CONFIL(IDSOSS,DLAT,DLON)
+Filt.F90:            NCUT(J,K)  = N
+Filt.F90:                  NCUT(J,K)= L     ! L is critical wave number at latitude j
+Filt.F90:               IF ( NCUT(J,K).LT.N ) THEN
+Filt.F90:   END SUBROUTINE
+flexib.F90:   real(r8) :: a21, a22, a23  ! flexible coefficients of L(UT)
+hdif.F90:!!   SUBROUTINE HDIFUS( deltat, PLY, U, V, T, Q )
+hdif.F90:   SUBROUTINE HDIFUS( deltat, PLY, U, V, T )
+hdif.F90:   SUBROUTINE STDFSC
+hdif.F90:      real(r8) :: AUT, AVO, AUO	  
+hdif.F90:      AUT     = AVT   / FOUR
+hdif.F90:         FRDU(J,2) = AUT * SVI*SVI   
+hdif.F90:         FRDU(J,3) = AUT * SVJ*SVJ
+iap_fft.F90:   SUBROUTINE IAP_FFT99(A,WORK,TRIGS,IFAX,INC,JUMP,N,LOT,ISIGN)
+iap_fft.F90:!!   SUBROUTINE IAP_FFT99(A,WORK,INC,JUMP,LOT,ISIGN)
+iap_fft.F90:!              THIS IS AN ALL-FORTRAN VERSION OF A OPTIMIZED ROUTINE
+iap_fft.F90:!              THE PACKAGE IAP_FFT99F CONTAINS SEVERAL USER-LEVEL ROUTINES:
+iap_fft.F90:!            SUBROUTINE IAP_SET99
+iap_fft.F90:!                AN INITIALIZATION ROUTINE THAT MUST BE CALLED ONCE
+iap_fft.F90:!                BEFORE A SEQUENCE OF CALLS TO THE FFT ROUTINES
+iap_fft.F90:!            SUBROUTINES IAP_FFT99 AND IAP_FFT991
+iap_fft.F90:!                TWO FFT ROUTINES THAT RETURN SLIGHTLY DIFFERENT
+iap_fft.F90:! SUBROUTINE IAP_SET99 (TRIGS, IFAX, N)
+iap_fft.F90:! PURPOSE      A SET-UP ROUTINE FOR IAP_FFT99 AND IAP_FFT991.  IT NEED ONLY BE
+iap_fft.F90:!              ROUTINES (PROVIDED THAT N IS NOT CHANGED).
+iap_fft.F90:! ON INPUT     TRIGS
+iap_fft.F90:! ON OUTPUT    IFAX
+iap_fft.F90:!               USED BY THE FFT ROUTINES.
+iap_fft.F90:! SUBROUTINE IAP_FFT991 (A,WORK,TRIGS,IFAX,INC,JUMP,N,M,ISIGN)
+iap_fft.F90:! SUBROUTINE IAP_FFT99 (A,WORK,TRIGS,IFAX,INC,JUMP,N,M,ISIGN)
+iap_fft.F90:!              OPTIMIZED ROUTINE IAP_FFT991 WRITTEN FOR XMP/YMPs BY
+iap_fft.F90:! ON INPUT     A
+iap_fft.F90:!               AN ARRAY OF LENGTH M*(N+2) CONTAINING THE INPUT DATA
+iap_fft.F90:!               CONSECUTIVELY STORED DATA).
+iap_fft.F90:! ON OUTPUT    A
+iap_fft.F90:!               CYCLIC CONTINUITY), COMPUTE THE CORRESPONDING VECTORS OF
+iap_fft.F90:!               COEFFICIENT VECTOR OVERWRITES THE CORRESPONDING INPUT
+iap_fft.F90:!     SUBROUTINE "IAP_FFT99" - MULTIPLE FAST REAL PERIODIC TRANSFORM
+iap_fft.F90:!     CORRESPONDING TO OLD SCALAR ROUTINE FFT9
+iap_fft.F90:!     A IS THE ARRAY CONTAINING INPUT AND OUTPUT DATA
+iap_fft.F90:!         (E.G. INC=1 FOR CONSECUTIVELY STORED DATA)
+iap_fft.F90:   END SUBROUTINE
+iap_fft.F90:   SUBROUTINE IAP_FFT99A(A,WORK,TRIGS,INC,JUMP,N,LOT)
+iap_fft.F90:!zhh      SUBROUTINE IAP_FFT99A(A,WORK,INC,JUMP,LOT)         !zhh
+iap_fft.F90:!     SUBROUTINE IAP_FFT99A - PREPROCESSING STEP FOR IAP_FFT99, ISIGN=+1
+iap_fft.F90:   END SUBROUTINE
+iap_fft.F90:   SUBROUTINE IAP_FFT99B(WORK,A,TRIGS,INC,JUMP,N,LOT)
+iap_fft.F90:!zhh      SUBROUTINE IAP_FFT99B(WORK,A,INC,JUMP,LOT)          !zhh
+iap_fft.F90:!     SUBROUTINE IAP_FFT99B - POSTPROCESSING STEP FOR IAP_FFT99, ISIGN=-1
+iap_fft.F90:   END SUBROUTINE
+iap_fft.F90:   SUBROUTINE IAP_FFT991(A,WORK,TRIGS,IFAX,INC,JUMP,N,LOT,ISIGN)
+iap_fft.F90:!zhh      SUBROUTINE IAP_FFT991(A,WORK,INC,JUMP,LOT,ISIGN)                   !zhh
+iap_fft.F90:!     SUBROUTINE "IAP_FFT991" - MULTIPLE REAL/HALF-COMPLEX PERIODIC
+iap_fft.F90:!     A IS THE ARRAY CONTAINING INPUT AND OUTPUT DATA
+iap_fft.F90:!         (E.G. INC=1 FOR CONSECUTIVELY STORED DATA)
+iap_fft.F90:   END SUBROUTINE
+iap_fft.F90:!zhh      SUBROUTINE IAP_SET99 (TRIGS, IFAX, N)
+iap_fft.F90:   SUBROUTINE IAP_SET99                      !zhh
+iap_fft.F90:! TO DO COMPLEX/COMPLEX TRANSFORMS WITH OTHER VALUES OF MODE, BUT
+iap_fft.F90:! DOCUMENTATION OF THE DETAILS WERE NOT AVAILABLE WHEN THIS ROUTINE
+iap_fft.F90:   END SUBROUTINE
+iap_fft.F90:   SUBROUTINE IAP_FAX(IFAX,N,MODE)
+iap_fft.F90:!!      SUBROUTINE IAP_FAX(MODE)
+iap_fft.F90:   END SUBROUTINE
+iap_fft.F90:   SUBROUTINE IAP_FFTRIG(TRIGS,N,MODE)
+iap_fft.F90:!zhh      SUBROUTINE IAP_FFTRIG(MODE)
+iap_fft.F90:   END SUBROUTINE
+iap_fft.F90:   SUBROUTINE IAP_VPASSM(A,B,C,D,TRIGS,INC1,INC2,INC3,INC4,LOT,N,IFAC,LA)
+iap_fft.F90:!     SUBROUTINE "IAP_VPASSM" - MULTIPLE VERSION OF "VPASSA"
+iap_fft.F90:!     AS PART OF MULTIPLE COMPLEX FFT ROUTINE
+iap_fft.F90:!     A IS FIRST REAL INPUT VECTOR
+iap_fft.F90:!     B IS FIRST IMAGINARY INPUT VECTOR
+iap_fft.F90:!     C IS FIRST REAL OUTPUT VECTOR
+iap_fft.F90:!     D IS FIRST IMAGINARY OUTPUT VECTOR
+iap_fft.F90:   END SUBROUTINE
+IAP_prog.F90:   real(r8), allocatable :: UT(:,:,:)     ! UT = PT*U
+IAP_prog.F90:      allocate ( UT    (NX,beglev:endlev,beglatdynex:endlatdynex) )
+IAP_prog.F90:      UT(:,:,:)     = inf
+inidat.F90:! !IROUTINE: scatter_q_field_to_block --- scatter a 3D constituent array to prognostic array q3
+inidat.F90:! !INPUT PARAMETERS:
+inital.F90:! !ROUTINE:  inital --- Define initial conditions for first run of case
+initial_dyn.F90:SUBROUTINE initial_dyn
+init_trans_IAP.F90:! Purpose: Transform P, U, V, T, Q to PT, UT, VT, TT, QT at first time step.
+init_trans_IAP.F90:                         PT, UT, VT, TT, QT, QTliq, QTice  
+init_trans_IAP.F90:            UT(I,K,J) = U(I,K,J) * PTU(I,J)
+mass_engy_fix.F90:   call outfld ('UTEND   ',utend,plon,lat)
+nldsmd.F90:SUBROUTINE NLDSMD(X,F,EPS)
+nldsmd.F90:!     COMPUTE PARTIAL DERIVATIVE OF F & LAMDA:DFDX & RLD
+nldsmd.F90:!     FINDING A NEW TRIAL SOLUTION  
+nliter_uvt.F90:SUBROUTINE nliter_uvt(CCU,CCV,CCT,CT)
+nliter_uvt.F90:   use IAP_prog,  only : UT, VT, TT 
+nliter_uvt.F90:   real(r8), intent(in) :: CCU(NX,beglev:endlev,beglatdyn:endlatdyn)   ! input prognostic variables for iteration,  UT
+nliter_uvt.F90:               UT(I,K,J) = CCU(I,K,J)+CT*DU(I,K,J)  ! CCU = UT
+nliter_uvt.F90:            call period( UT(1,K,J) )      ! for spherical cyclicity
+nliter_uvt.F90:               UT(I,K,J) = ZERO
+nliter_uvt.F90:            call period( UT(1,K,J) )      ! for spherical cyclicity
+nliter_uvt.F90:               UT(I,K,J) = ZERO
+nliter_uvtp.F90:SUBROUTINE nliter_uvtp(CCU,CCV,CCT,CCP,CCP2,CT, Istar)
+nliter_uvtp.F90:   use IAP_prog,   only : P, PT, PS2, Psa, Pstar1, UT, VT, TT 
+nliter_uvtp.F90:   real(r8), intent(in) :: CCU(NX,beglev:endlev,beglatdyn:endlatdyn)   ! input prognostic variables for iteration,  UT
+nliter_uvtp.F90:               UT(I,K,J) = CCU(I,K,J)+CT*DU(I,K,J)  ! CCU = UT
+nliter_uvtp.F90:            call period( UT(1,K,J) )      ! for spherical cyclicity
+nliter_uvtp.F90:	           UT(I,K,J) = ZERO
+nliter_uvtp.F90:            call period( UT(1,K,J) )      ! for spherical cyclicity
+nliter_uvtp.F90:               UT(I,K,J) = ZERO
+nlitti.F90:SUBROUTINE NLITTI
+nlitti.F90:   use IAP_prog,  only : Psa, UT, VT, TT, Pstar1, U, V, T, P, Q,PT
+nlitti.F90:               UL(I,K,J) = UT(I,K,J)
+nlitti.F90:                  UT(I,K,J) = (UT(I,K,J) + UL(I,K,J)) * HALF
+nlitti.F90:               UL(I,K,J) = UT(I,K,J)
+nlitti.F90:                  UT(I,K,J) = (UT(I,K,J) + UL(I,K,J)) * HALF
+restart_dynamics.F90:		 tmp3d(IB:IE,:,j) = UT(IB:IE,:,plat+1-j)   
+restart_dynamics.F90:!            write(6,*) 'UT(14,7,180) =', UT(14,7,180), ' T(14,7,180) =', T(14,7,180)
+restart_dynamics.F90:            write(6,*) 'UT(4,7,179) =', UT(4,7,179), ' T(4,7,179) =', T(4,7,179)
+restart_dynamics.F90:            write (6,*) 'WRTOUT ioerror ',ioerr,' on i/o unit = ',iu
+restart_dynamics.F90:            call endrun ('WRTOUT')
+restart_dynamics.F90:         call endrun ('WRTOUT')
+restart_dynamics.F90:		 UT(IB:IE,:,plat+1-j) = tmp3d(IB:IE,:,j)   
+restart_dynamics.F90:          call period(UT(1,k,plat+1-j))
+restart_dynamics.F90:            write(6,*) 'UT(4,7,179) =', UT(4,7,179), ' T(4,7,179) =', T(4,7,179)
+setdyf.F90:SUBROUTINE SETDYF
+sm9h.F90:   real(r8) :: RA01(NY,2)    ! weight factor of NORTH/SOUTH/EAST/WEST value
+sm9h.F90:   SUBROUTINE SM9HAS(F,IV)
+sm9h.F90:   END SUBROUTINE 
+sm9h.F90:   SUBROUTINE STSM9C(IDWEAK)
+sm9h.F90:!                   NORTH/SOUTH/EAST/WEST      BY 3 /32
+sm9h.F90:!                   NORTH/SOUTH/EAST/WEST      BY 1 / 8
+sm9h.F90:   END SUBROUTINE
+smoother.F90:   SUBROUTINE SMOOTH
+smoother.F90:   END SUBROUTINE
+smoother.F90:   SUBROUTINE SMOTHP
+smoother.F90:   END SUBROUTINE
+smoother.F90:   SUBROUTINE STSMOT
+smoother.F90:   END SUBROUTINE
+smoother.F90:   SUBROUTINE SOSS2D(A,IV,IP,IC)
+smoother.F90:!     NEAR NORTH/SOUTH POLES
+smoother.F90:   END SUBROUTINE 
+smoother.F90:   SUBROUTINE SOSS1D(A,JST,JED,IC)
+smoother.F90:   END SUBROUTINE
+smoother.F90:   SUBROUTINE STSOSS
+smoother.F90:  END SUBROUTINE
+spmd_dyn.F90:! !IROUTINE: spmdinit_dyn --- SPMD initialization for dynamics
+stdatm.F90:   SUBROUTINE crestdatm
+stdatm.F90:            PRINT*,'P IN STD.ATM IS OUT OF [0.5hPa,1160hPa] ==> STOP !'  
+stdatm.F90:   END SUBROUTINE
+stdatm.F90:   SUBROUTINE SETMSA( EROR )
+stdatm.F90:   END SUBROUTINE
+stdatm.F90:   SUBROUTINE DIAGBB(ITYPE)
+stdatm.F90:   END SUBROUTINE
+stdatm.F90:   SUBROUTINE USA76 (P,HUSA,TUSA)
+stdatm.F90:   END SUBROUTINE
+tend_adv.F90:SUBROUTINE tend_adv
+tend_adv.F90:   use IAP_prog,  only: TT, UT, VT, Ustar, Vstar, WSstar 
+tend_adv.F90:   real(r8) :: UL1, UL2, UL3                ! advection terms of UT
+tend_adv.F90:!     *******************          COMPUTE DT        ********************
+tend_adv.F90:!     COMPUTE    DTT/DT
+tend_adv.F90:            UZ(I,K,J) = UT(I,K-1,J)
+tend_adv.F90:                      1, NX,beglev,endlev, beglatdyn, beglatdyn,  UT,VT )
+tend_adv.F90:                      1, NX,beglev,endlev, endlatdynex, endlatdynex,UT,VT )
+tend_adv.F90:                      1, NX,beglev,endlev, endlatdyn, endlatdyn,  UT,VT )
+tend_adv.F90:                      1, NX,beglev,endlev, beglatdynex, beglatdynex, UT,VT )
+tend_adv.F90:!------------------ COMPUTE DTT/DT FOR J [JB,JE]  &  I [IB,IE]  &  K [1,NL] ---------------------
+tend_adv.F90:!---------------------------------COMPUTE DTT/DT AT NORTH POLE------------------------------------
+tend_adv.F90:!           COMPUTE HORIZONTAL & VERTICAL ADVECTION OF TT
+tend_adv.F90:!-------------------------------- COMPUTE DTT/DT AT south POLES -------------------------------------
+tend_adv.F90:!           COMPUTE HORIZONTAL & VERTICAL ADVECTION OF TT
+tend_adv.F90:!     ****************         COMPUTE DU & DV        *******************
+tend_adv.F90:!jjr   call mpi_move_right(    UT(1,1,beglatdyn),    UT(1,1,endlatdyn+1),NX*NL)
+tend_adv.F90:!jjr   call mpi_move_left(   UT(1,1,endlatdyn),    UT(1,1,beglatdyn-1),NX*NL)
+tend_adv.F90:!jjr            UZ(I,K,J) = UT(I,K-1,J) 
+tend_adv.F90:!         COMPUTE DV/DT AT J=1
+tend_adv.F90:! ----------------- COMPUTE DU/DT & DV/DT FOR J [JB,JE] & I [IB,IE] & K [1,NL] ------------------
+tend_adv.F90:! for UT =================================================================================
+tend_adv.F90:               UL1  = OUXQ(J) * ( alpha(J) * ((Ustar(I  ,K,J)+Ustar(I+1,K,J))*UT(I+1,K,J)   &
+tend_adv.F90:                                           -  (Ustar(I  ,K,J)+Ustar(I-1,K,J))*UT(I-1,K,J))  &   
+tend_adv.F90:                            + betaw(J)/3.0 * ((Ustar(I+2,K,J)+Ustar(I+1,K,J))*UT(I+3,K,J)   &
+tend_adv.F90:	        		           -  (Ustar(I-1,K,J)+Ustar(I-2,K,J))*UT(I-3,K,J))  ) !(4.7)
+tend_adv.F90:               UL2  = RUPQ(J) * (Vstar(I,  K,J) + Vstar(I-1  ,K,J)) * UT(I,K,J+1)           &
+tend_adv.F90:                    - RUMQ(J) * (Vstar(I,K,J-1) + Vstar(I-1,K,J-1)) * UT(I,K,J-1)   ! (4.8)
+tend_adv.F90:      ELSE   !  J = NY  AT THE SOUTH POLAR
+tendency.F90:   real(r8), allocatable :: DU(:,:,:)     ! tendency of UT
+tendency.F90:   real(r8), allocatable :: SU(:,:,:)     ! soure & sink tendency of UT
+tend_lin.F90:SUBROUTINE tend_lin
+tend_lin.F90:   use IAP_prog,  only: PT, TT, UT, VT, WST, Psa, U, WS, WPV, PLY, GHI,     &
+tend_lin.F90:!     **************        COMPUTE DPsa & DT        ********************
+tend_lin.F90:!------------------- COMPUTE FACTORS RELATED TO (I,J) ONLY ----------------------
+tend_lin.F90:!     COMPUTE    DTT/DT
+tend_lin.F90:! -------------------------------- COMPUTE DIVERGENCES & THEIR SUMS --------------------------
+tend_lin.F90:!jjr               DIVX = alpha(J)*(PXW(I+1,J) *UT(I+1,K,J) - PXW(I,J)*UT(I  ,K,J))   &
+tend_lin.F90:               DIV(I,K,J) = alpha(J)*(PXW(I+1,J) *UT(I+1,K,J) - PXW(I,J)*UT(I  ,K,J))   &
+tend_lin.F90:!jjr                    + betaw(J)*(PXW2(I+2,J)*UT(I+2,K,J) - PXW2(I-1,J)*UT(I-1,K,J))/3.0 !(4.21)
+tend_lin.F90:                    + betaw(J)*(PXW2(I+2,J)*UT(I+2,K,J) - PXW2(I-1,J)*UT(I-1,K,J))/3.0 &!(4.21)
+tend_lin.F90:! -------------------------------- COMPUTE DIVERGENCES & THEIR SUMS --------------------------
+tend_lin.F90:!-------------------------------- COMPUTE DP'sa/DT & D(SIGMA)/DT -------------------------------
+tend_lin.F90:!------------------ COMPUTE DTT/DT FOR J [JB,JE]  &  I [IB,IE]  &  K [1,NL] ---------------------
+tend_lin.F90:               OO2X = OUXH(J)/Pstar1(I,J)*(alpha(J)*(DXP1*UT(I+1,K,J)+DXP0*UT(I,K,J))  &
+tend_lin.F90:                                      +betaw(J)/3.0*(DXP3*UT(I+2,K,J)+DXP2*UT(I-1,K,J)))  !(4.18)
+tend_lin.F90:! -------------------------COMPUTE DIVERGENCE AT NORTH POLE------------------------------
+tend_lin.F90:!----------------------COMPUTE DP/DT & D(SIGMA)/DT AT NORTH POLE------------------------
+tend_lin.F90:!---------------------------------COMPUTE DTT/DT AT NORTH POLE------------------------------------
+tend_lin.F90:!           COMPUTE HORIZONTAL & VERTICAL ADVECTION OF TT
+tend_lin.F90:!  -------------------------------- FOR THE SOUTH POLAR POINTS --------------------------------------
+tend_lin.F90:!  COMPUTE DIVERGENCE AT SOUTH POLE
+tend_lin.F90:            PRINT*,'IN THE SOUTHEN POLAR:    DP=',DPS1,I,J
+tend_lin.F90:!-------------------- COMPUTE DP/DT & D(SIGMA)/DT & WPV AT SOUTH POLE ------------------------
+tend_lin.F90:!-------------------------------- COMPUTE DTT/DT AT south POLES -------------------------------------
+tend_lin.F90:!           COMPUTE HORIZONTAL & VERTICAL ADVECTION OF TT
+tend_lin.F90:!jjr UT
+tend_lin.F90:                      1, NX,beglev,endlev, beglatdyn, beglatdyn,  UT )
+tend_lin.F90:                      1, NX,beglev,endlev, endlatdynex, endlatdynex, UT )
+tend_lin.F90:!     ****************         COMPUTE DU & DV        *******************
+tend_lin.F90:!jjr   call mpi_move_right(    UT(1,1,beglatdyn),     UT(1,1,endlatdyn+1),NX*NL)
+tend_lin.F90:! --------------------- COMPUTE PY AT THE NORTH POLAR (J=1) -------------------------------
+tend_lin.F90:!     COMPUTE PX & PY FROM J=JB TO J=JE
+tend_lin.F90:      ELSE        ! AT THE SOUTH POLAR (J=NY)
+tend_lin.F90:!         COMPUTE DV/DT AT J=1
+tend_lin.F90:               FSU = FOURTH * ( fstar0 * UT(I,K,JB) + fstar1 * UT(I+1,K,JB) )
+tend_lin.F90:! ----------------- COMPUTE DU/DT & DV/DT FOR J [JB,JE] & I [IB,IE] & K [1,NL] ------------------
+tend_lin.F90:               FSU  = FOURTH * ( FS0 * UT(I,K,J)   + FS1 * UT(I+1,K,J)                      &
+tend_lin.F90:                    +            FS2 * UT(I,K,J+1) + FS3 * UT(I+1,K,J+1) )          ! (4.6)
+tend_lin.F90:      ELSE   !  J = NY  AT THE SOUTH POLAR
+tend_pstar.F90:SUBROUTINE tend_pstar( Istar )       
+tend_pstar.F90:   use IAP_prog,   only: PT, UT, VT, P, U, V, WS, PLY, Ustar, Vstar,    &
+tend_pstar.F90:               U(I,K,J) = UT(I,K,J) / PTU(I,J)
+tend_pstar.F90:!------------------- COMPUTE FACTORS RELATED TO (I,J) ONLY ----------------------
+tend_pstar.F90:! -------------------------------- COMPUTE DIVERGENCES & THEIR SUMS --------------------------
+tend_pstar.F90:! -------------------------------- COMPUTE DIVERGENCES & THEIR SUMS --------------------------
+tend_pstar.F90:! -------------------------COMPUTE DIVERGENCE AT NORTH POLE------------------------------
+tend_pstar.F90:! ------------------------- COMPUTE DIVERGENCE AT SOUTH POLE ---------------------------
+Trans_coef.F90:   real(r8) :: PTU(NX,NY)     ! transformation coefficient from U to UT, UT = U * PTU
+Trans_coef.F90:   SUBROUTINE MDINIT
+Trans_coef.F90:!------------------ COMPUTE PRESSURE AT MODEL & INTERFACE SIGMA LAYERS ----------------------
+Trans_coef.F90:!--------------- COMPUTE GEOPOTENTIAL HEIGHT DEPARTURE ---------------------------
+Trans_coef.F90:   SUBROUTINE TRANSC
+Trans_coef.F90:   END SUBROUTINE
+Trans_coef.F90:   SUBROUTINE trans_IAP_tend(IC, DSU, DSV, DST)    !zhh 2008.4.21
+Trans_coef.F90:!  Purpose: BACK FROM PHYSICS ROUTINE TO DYNAMICS ROUTINE TO INITIALIZE THE DYNAMIC MODEL
+Trans_coef.F90:   END SUBROUTINE
+Trans_coef.F90:   SUBROUTINE PHYSDM(IC, U, V, T)    !zhh 2008.4.21
+Trans_coef.F90:!  Purpose: BACK FROM PHYSICS ROUTINE TO DYNAMICS ROUTINE TO INITIALIZE THE DYNAMIC MODEL
+Trans_coef.F90:      use IAP_prog, only : P, UT, VT, TT
+Trans_coef.F90:!     COMPUTE THE LATEST UT & VT & TT & QT
+Trans_coef.F90:                  WU(I,K,J)   = WU(I,K,J) - UT(I,K,J)   ! DU
+Trans_coef.F90:!       RENEW UT & VT & TT
+Trans_coef.F90:                  UT(I,K,J) = WU(I,K,J) + UT(I,K,J)
+Trans_coef.F90:                  UT(I,K,J)   = WU(I,K,J)
+Trans_coef.F90:   END SUBROUTINE
+Trans_coef.F90:   SUBROUTINE trans_antiIAP
+Trans_coef.F90:      use IAP_prog, only : P, UT, VT, TT, U, V, T
+Trans_coef.F90:!     DEDUCE   ( U,V,T,Q )  FROM   ( UT,VT,TT,QT ) 
+Trans_coef.F90:               U(I,K,J) = UT(I,K,J) / PTU(I,J)  ! u=U/P
+Trans_coef.F90:   END SUBROUTINE
+Trans_coef.F90:   SUBROUTINE trans_IAP
+Trans_coef.F90:      use IAP_prog, only : P, UT, VT, TT, U, V, T
+Trans_coef.F90:!     DEDUCE   ( U,V,T,Q )  FROM   ( UT,VT,TT,QT ) 
+Trans_coef.F90:               UT(I,K,J) = U(I,K,J) * PTU(I,J)  
+Trans_coef.F90:   END SUBROUTINE
+Trans_coef.F90:   SUBROUTINE trans_af_mass( ps, t3, q3, ppcnst, n3, npt )
+Trans_coef.F90:! for UT, VT, TT      
+Trans_coef.F90:!------------------ COMPUTE PRESSURE AT MODEL & INTERFACE SIGMA LAYERS ----------------------
+Trans_coef.F90:!--------------- COMPUTE GEOPOTENTIAL HEIGHT DEPARTURE ---------------------------
+Trans_coef.F90:   END SUBROUTINE
+vapor.F90:   SUBROUTINE QPDATA( IFILTQ,IBCFFT )
+vapor.F90:!     SAVE THE FIELD ON INPUT
+vapor.F90:!------------------- PERFORM VERTICAL REDISTRIBUTION TO AVOID NEGATIVE Q-H2O -------------------
+vapor.F90:   END SUBROUTINE
+vapor.F90:   SUBROUTINE MPDATA (Q,U,V,P,IORD)
+vapor.F90:   END SUBROUTINE
+vapor.F90:   SUBROUTINE VPDATA(Q,W,IORD)
+vapor.F90:   END SUBROUTINE
+vapor.F90:   SUBROUTINE AVNEGQ( Q )
+vapor.F90:   END SUBROUTINE
+xpavg.F90:! !ROUTINE:  xpaxg --- Average a scalar latitude field
+xpavg.F90:! !INPUT PARAMETERS:
+xpavg.F90:! !INPUT/OUTPUT PARAMETERS:

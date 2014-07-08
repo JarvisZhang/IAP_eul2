@@ -1,0 +1,437 @@
+#include <misc.h>
+#include <params.h>
+
+module restart_dynamics
+!--------------------------------------------------------------------
+! Modified by ZhangHe, 2007.5.25
+! Update : ZhangHe, 2008.6.5
+!          ZhangHe, 2008.6.21
+!          ZhangHe, 2008.7.21, write the IAP dynamical fields from 
+!                              (beglatdyn --> endlatdyn) to (beglat --> endlat) 
+!--------------------------------------------------------------------
+
+   use shr_kind_mod, only: r8 => shr_kind_r8
+   use pmgrid,       only: plon, plat, plev, beglat, endlat, plnlv,    &
+                           beglatdyn, endlatdyn, beglatdynex, masterproc  !zhh
+! =====================================================
+   use IAP_grid,     only: NX, NL, NZ       
+! =====================================================
+   use prognostics
+   use IAP_prog
+   use constituents, only: pnats, pcnst, ppcnst
+   use ppgrid, only: pcols, pver
+   use binary_io     ! for wrtout_r8 & readin_r8
+   use scanslt,      only: scanslt_alloc, lammp, phimp, sigmp, qfcst
+   use massfix,      only: alpha, hw1, hw2, hw3
+#if ( defined BFB_CAM_SCAM_IOP )
+   use iop,          only: alphasav, dqfx3savm1, divq3dsav, divt3dsav, t3sav, u3sav, &
+                           v3sav, t2sav, q3sav, pssav, tssav, fixmassav, betasav,    &
+                           init_iop_fields
+#endif
+   use abortutils, only: endrun
+   use constituents, only: cnst_need_pdeldry
+
+   implicit none
+
+CONTAINS
+
+   subroutine write_restart_dynamics (nrg)
+
+#include <comqfl.h>
+
+!
+! Input arguments
+!
+      integer, intent(in) :: nrg     ! Unit number
+!
+! Local workspace
+!
+      integer :: ioerr   ! error status
+      integer :: k, j, jd
+! =================== zhh 2008.7.21 ===================
+      real(r8), allocatable :: tmp2d(:,:)
+      real(r8), allocatable :: tmp3d(:,:,:)
+      real(r8), allocatable :: tmp3dz(:,:,:)
+! =================== zhh 2008.7.21 ===================
+!--------------------------------------------------------------------
+!
+! allocate arrays
+      allocate ( tmp2d(NX,   beglat:endlat) )
+      allocate ( tmp3d(NX,NL,beglat:endlat) )
+      allocate ( tmp3dz(NX,NZ,beglat:endlat) )
+!
+! Write fields for cam physics
+!
+      call wrtout_r8 (nrg,phis  ,plon )
+      call wrtout_r8 (nrg,omga  ,plnlv)
+!
+! Write fields u3,v3,t3,q3,ps at time n3m2 & n3m1
+!
+      call wrtout_r8 (nrg,u3(1,1,beglat,n3m1)  ,plnlv)
+      call wrtout_r8 (nrg,v3(1,1,beglat,n3m1)  ,plnlv)
+      call wrtout_r8 (nrg,t3(1,1,beglat,n3m1)  ,plnlv)
+      call wrtout_r8 (nrg,ps(1,beglat,n3m1)  ,plon)
+
+      call wrtout_r8 (nrg,u3(1,1,beglat,n3m2)  ,plnlv)
+      call wrtout_r8 (nrg,v3(1,1,beglat,n3m2)  ,plnlv)
+      call wrtout_r8 (nrg,t3(1,1,beglat,n3m2)  ,plnlv)
+      call wrtout_r8 (nrg,ps(1,beglat,n3m2)  ,plon)
+      
+      call wrtout_r8 (nrg,q3(1,1,1,beglat,n3m2),plnlv*(pcnst+pnats))
+      call wrtout_r8 (nrg,q3(1,1,1,beglat,n3m1),plnlv*(pcnst+pnats))
+      if (cnst_need_pdeldry) then
+         call wrtout_r8 (nrg,pdeld(1,1,beglat,n3)  ,plnlv)
+         call wrtout_r8 (nrg,pdeld(1,1,beglat,n3m1)  ,plnlv)
+         call wrtout_r8 (nrg,pdeld(1,1,beglat,n3m2)  ,plnlv)
+      endif !
+!
+! Write slt arrays (trajectory mid-point coordinates and 
+! slt forcast of moisture and constituents
+!
+      call wrtout_r8 (nrg,lammp,plnlv)
+      call wrtout_r8 (nrg,phimp,plnlv)
+      call wrtout_r8 (nrg,sigmp,plnlv)
+      call wrtout_r8 (nrg,qfcst,plnlv*pcnst)
+!
+! Write dynamical fields for restart
+!
+! for 2-D
+! =================== zhh 2008.7.21 ===================
+      do j = beglat, endlat
+		 tmp2d(:,j) = P(:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp2d(1,beglat), NX)
+!
+      do j = beglat, endlat
+		 tmp2d(:,j) = PT(:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp2d(1,beglat), NX)
+!
+      do j = beglat, endlat
+		 tmp2d(:,j) = Pstar1(:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp2d(1,beglat), NX)
+!
+      do j = beglat, endlat
+		 tmp2d(:,j) = Psa(:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp2d(1,beglat), NX)
+!
+      do j = beglat, endlat
+		 tmp2d(:,j) = PS2(:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp2d(1,beglat), NX)
+!
+      do j = beglat, endlat
+		 tmp2d(:,j) = GHS(:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp2d(1,beglat), NX)
+!
+! for 3-D
+      do j = beglat, endlat
+		 tmp3d(:,:,j) = U(:,:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+!
+      do j = beglat, endlat
+		 tmp3d(:,:,j) = V(:,:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+!
+      do j = beglat, endlat
+		 tmp3d(:,:,j) = T(:,:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+!
+      do j = beglat, endlat
+		 tmp3d(:,:,j) = Q(:,:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+!
+      do j = beglat, endlat
+		 tmp3d(:,:,j) = UT(:,:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+!
+      do j = beglat, endlat
+		 tmp3d(:,:,j) = VT(:,:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+!
+      do j = beglat, endlat
+		 tmp3d(:,:,j) = TT(:,:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+!
+      do j = beglat, endlat
+		 tmp3dz(:,:,j) = WS(:,:,plat+1-j)   
+      end do
+      call wrtout_r8 (nrg, tmp3dz(1,1,beglat), NX*NZ)
+! =================== zhh 2008.7.21 ===================
+!
+! Write global integrals
+!
+      if (masterproc) then
+         write(nrg, iostat=ioerr) tmass0, fixmas, hw1,    hw2,  &
+                                  hw3, alpha
+         if (ioerr /= 0 ) then
+            write (6,*) 'WRITE ioerror ',ioerr,' on i/o unit = ',nrg
+            call endrun ('WRITE_RESTART_DYNAMICS')
+         end if
+      end if
+
+#if ( defined BFB_CAM_SCAM_IOP )
+!
+! Write scam values
+!
+     call wrtout_r8 (nrg,alphasav(1,beglat),pcnst)
+     call wrtout_r8 (nrg,dqfx3savm1(1,1,1,beglat),plnlv*pcnst)       
+     call wrtout_r8 (nrg,divq3dsav(1,1,1,beglat),plnlv*ppcnst)
+     call wrtout_r8 (nrg,divt3dsav(1,1,beglat),plnlv)       
+     call wrtout_r8 (nrg,t3sav(1,1,beglat),plnlv)       
+     call wrtout_r8 (nrg,u3sav(1,1,beglat),plnlv)
+     call wrtout_r8 (nrg,v3sav(1,1,beglat),plnlv)
+     call wrtout_r8 (nrg,t2sav(1,1,beglat),plnlv)
+     call wrtout_r8 (nrg,q3sav(1,1,1,beglat),plnlv*ppcnst)
+     call wrtout_r8 (nrg,pssav(1,beglat),plon)
+     call wrtout_r8 (nrg,tssav(1,beglat),plon)
+     call wrtout_r8 (nrg,fixmassav(beglat),1)
+     call wrtout_r8 (nrg,betasav(beglat),1)
+#endif
+! ============================ for test =================================
+      do j = beglat, endlat
+!         jd = plat+1-j
+		 if ( j == 64 ) then
+            write(6,*) '--------------- At sub. write_restart_dynamics --------------------'
+            write(6,*) 'UT(4,1,65) =', UT(4,1,65), ' T(4,26,65) =', T(4,26,65)
+            write(6,*) 'VT(4,1,65) =', VT(4,1,65)
+            write(6,*) 'Q(4,26,65) =', Q(4,26,65), ' ps(4,64,n3m1) =', ps(4,64,n3m1)
+            write(6,*) 'v3(4,26,64,n3m1) =', v3(4,26,64,n3m1)
+            write(6,*) 'q3(4,26,2,64,n3m1) =', q3(4,26,2,64,n3m1)
+            write(6,*) '--------------------------------------------------------------'
+         end if
+!         write(6,*) 'VT(4,1,',jd,') =', VT(4,1,jd)
+!         write(6,*) 'PT(4,',jd,') =', PT(4,jd)
+      end do
+! =============================== zhh ===================================
+! deallocate
+      deallocate(tmp2d)
+      deallocate(tmp3d)
+      deallocate(tmp3dz)
+!
+      return
+   end subroutine write_restart_dynamics
+
+!#######################################################################
+
+   subroutine read_restart_dynamics (nrg)
+!jjr
+      use dynamics_vars, only: dynamics_init
+      use time_manager, only: get_step_size
+!jjr
+#if ( defined SPMD )
+      use mpishorthand
+#endif
+
+#include <comqfl.h>
+!
+! Input arguments
+!
+      integer, intent(in) :: nrg     ! Unit number
+!
+! Local workspace
+!
+      integer :: ioerr   ! error status
+      integer :: k,i,j,jd        !zhh 2007.12.20
+! =================== zhh 2008.7.21 ===================
+      real(r8), allocatable :: tmp2d(:,:)
+      real(r8), allocatable :: tmp3d(:,:,:)
+      real(r8), allocatable :: tmp3dz(:,:,:)
+! =================== zhh 2008.7.21 ===================
+!--------------------------------------------------------------------
+!
+! allocate arrays
+      allocate ( tmp2d(NX,   beglat:endlat) )
+      allocate ( tmp3d(NX,NL,beglat:endlat) )
+      allocate ( tmp3dz(NX,NZ,beglat:endlat) )
+!
+! Read fields for cam physics
+!
+      call initialize_prognostics
+      call initialize_IAPprog     !zhh 2008.6.10
+
+      call readin_r8 (nrg,phis  ,plon )
+      call readin_r8 (nrg,omga  ,plnlv)
+!
+! Read fields u3,v3,t3,q3,ps at time indices n3m2 & n3m1
+!
+      call readin_r8 (nrg,u3(1,1,beglat,n3m1)  ,plnlv)
+      call readin_r8 (nrg,v3(1,1,beglat,n3m1)  ,plnlv)
+      call readin_r8 (nrg,t3(1,1,beglat,n3m1)  ,plnlv)
+      call readin_r8 (nrg,ps(1,beglat,n3m1)  ,plon)
+
+      call readin_r8 (nrg,u3(1,1,beglat,n3m2)  ,plnlv)
+      call readin_r8 (nrg,v3(1,1,beglat,n3m2)  ,plnlv)
+      call readin_r8 (nrg,t3(1,1,beglat,n3m2)  ,plnlv)
+      call readin_r8 (nrg,ps(1,beglat,n3m2)  ,plon)
+      
+      call readin_r8 (nrg,q3(1,1,1,beglat,n3m2),plnlv*(pcnst+pnats))
+      call readin_r8 (nrg,q3(1,1,1,beglat,n3m1),plnlv*(pcnst+pnats))
+      if (cnst_need_pdeldry) then
+         call readin_r8 (nrg,pdeld(1,1,beglat,n3)  ,plnlv)
+         call readin_r8 (nrg,pdeld(1,1,beglat,n3m1)  ,plnlv)
+         call readin_r8 (nrg,pdeld(1,1,beglat,n3m2)  ,plnlv)
+      endif !
+!
+! Write slt arrays (trajectory mid-point coordinates and 
+! slt forcast of moisture and constituents
+!
+      call scanslt_alloc()
+      call readin_r8 (nrg,lammp,plnlv)
+      call readin_r8 (nrg,phimp,plnlv)
+      call readin_r8 (nrg,sigmp,plnlv)
+      call readin_r8 (nrg,qfcst,plnlv*pcnst)
+!
+! Read dynamical fields
+! for 2-D
+      call readin_r8 (nrg, tmp2d(1,beglat), NX)
+      do j = beglat, endlat
+		 P(:,plat+1-j) = tmp2d(:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp2d(1,beglat), NX)
+      do j = beglat, endlat
+		 PT(:,plat+1-j) = tmp2d(:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp2d(1,beglat), NX)
+      do j = beglat, endlat
+		 Pstar1(:,plat+1-j) = tmp2d(:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp2d(1,beglat), NX)
+      do j = beglat, endlat
+		 Psa(:,plat+1-j) = tmp2d(:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp2d(1,beglat), NX)
+      do j = beglat, endlat
+		 PS2(:,plat+1-j) = tmp2d(:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp2d(1,beglat), NX)
+      do j = beglat, endlat
+		 GHS(:,plat+1-j) = tmp2d(:,j)   
+      end do
+!
+
+! for 3-D
+      call readin_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+      do j = beglat, endlat
+		 U(:,:,plat+1-j) = tmp3d(:,:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+      do j = beglat, endlat
+		 V(:,:,plat+1-j) = tmp3d(:,:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+      do j = beglat, endlat
+		 T(:,:,plat+1-j) = tmp3d(:,:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+      do j = beglat, endlat
+		 Q(:,:,plat+1-j) = tmp3d(:,:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+      do j = beglat, endlat
+		 UT(:,:,plat+1-j) = tmp3d(:,:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+      do j = beglat, endlat
+		 VT(:,:,plat+1-j) = tmp3d(:,:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp3d(1,1,beglat), NX*NL)
+      do j = beglat, endlat
+		 TT(:,:,plat+1-j) = tmp3d(:,:,j)   
+      end do
+!
+      call readin_r8 (nrg, tmp3dz(1,1,beglat), NX*NZ)
+      do j = beglat, endlat
+		 WS(:,:,plat+1-j) = tmp3dz(:,:,j)   
+      end do
+!
+! Read global integrals
+!
+      if (masterproc) then
+         read (nrg, iostat=ioerr) tmass0, fixmas, hw1,    hw2,  &
+                                  hw3, alpha
+         if (ioerr /= 0 ) then
+            write (6,*) 'WRITE ioerror ',ioerr,' on i/o unit = ',nrg
+            call endrun ('READ_RESTART_DYNAMICS')
+         end if
+      end if
+!
+! ============================ for test =================================
+      do j = beglat, endlat
+!         jd = plat+1-j
+		 if ( j == 64 ) then
+            write(6,*) '--------------- At sub. read_restart_dynamics --------------------'
+            write(6,*) 'UT(4,1,65) =', UT(4,1,65), ' T(4,26,65) =', T(4,26,65)
+            write(6,*) 'VT(4,1,65) =', VT(4,1,65)
+            write(6,*) 'Q(4,26,65) =', Q(4,26,65), ' ps(4,64,n3m1) =', ps(4,64,n3m1)
+            write(6,*) 'v3(4,26,64,n3m1) =', v3(4,26,64,n3m1)
+            write(6,*) 'q3(4,26,2,64,n3m1) =', q3(4,26,2,64,n3m1)
+            write(6,*) '--------------------------------------------------------------'
+         end if
+!         write(6,*) 'VT(4,1,',jd,') =', VT(4,1,jd)
+!         write(6,*) 'PT(4,',jd,') =', PT(4,jd)
+      end do
+! =============================== zhh ===================================
+!
+#if ( defined SPMD )
+!===================== delete by zhh ===============================
+   call mpibcast (tmass0,1         ,mpir8  ,0,mpicom)      
+   call mpibcast (fixmas,1         ,mpir8  ,0,mpicom)
+   call mpibcast (hw1   ,pcnst     ,mpir8  ,0,mpicom)
+   call mpibcast (hw2   ,pcnst     ,mpir8  ,0,mpicom)
+   call mpibcast (hw3   ,pcnst     ,mpir8  ,0,mpicom)   
+   call mpibcast (alpha ,pcnst     ,mpir8  ,0,mpicom)
+!===================== delete by zhh ===============================
+#endif
+#if ( defined BFB_CAM_SCAM_IOP )
+!
+! Read scam values
+!
+     call init_iop_fields(ps, t3, u3, v3, q3, nocopy=.true. )
+
+     call readin_r8 (nrg,alphasav(1,beglat),pcnst)
+     call readin_r8 (nrg,dqfx3savm1(1,1,1,beglat),plnlv*pcnst)       
+     call readin_r8 (nrg,divq3dsav(1,1,1,beglat),plnlv*ppcnst)
+     call readin_r8 (nrg,divt3dsav(1,1,beglat),plnlv)       
+     call readin_r8 (nrg,t3sav(1,1,beglat),plnlv)       
+     call readin_r8 (nrg,u3sav(1,1,beglat),plnlv)
+     call readin_r8 (nrg,v3sav(1,1,beglat),plnlv)
+     call readin_r8 (nrg,t2sav(1,1,beglat),plnlv)
+     call readin_r8 (nrg,q3sav(1,1,1,beglat),plnlv*ppcnst)
+     call readin_r8 (nrg,pssav(1,beglat),plon)
+     call readin_r8 (nrg,tssav(1,beglat),plon)
+     call readin_r8 (nrg,fixmassav(beglat),1)
+     call readin_r8 (nrg,betasav(beglat),1)
+#endif
+!
+! deallocate
+      deallocate(tmp2d)
+      deallocate(tmp3d)
+      deallocate(tmp3dz)
+!
+      return
+
+   end subroutine read_restart_dynamics
+
+end module restart_dynamics

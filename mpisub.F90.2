@@ -1,0 +1,36 @@
+#include <misc.h>
+#include <params.h>
+
+#if (defined SPMD)
+      subroutine mpi_move_left(sbuf, rbuf, leng)
+      use mpishorthand, only: mpir8,mpicom 
+      use shr_kind_mod, only: r8 => shr_kind_r8
+      use pmgrid,       only: myid_y,npr_y,iam
+      use spmd_dyn,     only: comm_y
+      implicit none
+      include 'mpif.h'
+      real(r8) sbuf(*), rbuf(*)
+!
+      integer leng, status(mpi_status_size), irq, ierr
+!
+      if(myid_y.ne.0)      call mpi_send(sbuf,leng,mpir8,myid_y-1,10,comm_y,ierr)
+      if(myid_y.ne.(npr_y-1)) call mpi_recv( rbuf,leng,mpir8,myid_y+1,10,comm_y,status,ierr)
+      return        
+      end     
+
+      subroutine mpi_move_right(sbuf, rbuf, leng)
+      use mpishorthand, only: mpir8,mpicom
+      use shr_kind_mod, only: r8 => shr_kind_r8
+      use pmgrid,       only: myid_y,npr_y,iam
+      use spmd_dyn,     only: comm_y
+       implicit none
+      include 'mpif.h'
+      real(r8) sbuf(*), rbuf(*)
+!
+      integer leng, status(mpi_status_size), ierr
+!
+      if(myid_y.ne.0)      call mpi_recv( rbuf,leng,mpir8,myid_y-1,10,comm_y,status,ierr)
+      if(myid_y.ne.(npr_y-1)) call mpi_send(sbuf,leng,mpir8,myid_y+1,10,comm_y,ierr)
+      return        
+      end     
+#endif
